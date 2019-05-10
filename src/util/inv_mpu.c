@@ -55,6 +55,8 @@ static inline int reg_int_cb(struct int_param_s *int_param)
 #error  Which gyro are you using? Define MPUxxxx in your compiler options.
 #endif
 
+#define my_min(a,b) ((a)<(b)?(a):(b))
+//#define my_min(a,b) min(a,b)
 /* Time for some messy macro work. =]
  * #define MPU9150
  * is equivalent to..
@@ -1361,7 +1363,7 @@ int mpu_set_sample_rate(unsigned short rate)
         st.chip_cfg.sample_rate = 1000 / (1 + data);
 
 #ifdef AK89xx_SECONDARY
-        mpu_set_compass_sample_rate(min(st.chip_cfg.compass_sample_rate, MAX_COMPASS_SAMPLE_RATE));
+        mpu_set_compass_sample_rate(my_min(st.chip_cfg.compass_sample_rate, MAX_COMPASS_SAMPLE_RATE));
 #endif
 
         /* Automatically set LPF to 1/2 sampling rate. */
@@ -2789,7 +2791,7 @@ int mpu_load_firmware(unsigned short length, const unsigned char *firmware,
     if (!firmware)
         return -1;
     for (ii = 0; ii < length; ii += this_write) {
-        this_write = min(LOAD_CHUNK, length - ii);
+        this_write = my_min(LOAD_CHUNK, length - ii);
         if (mpu_write_mem(ii, this_write, (unsigned char*)&firmware[ii]))
             return -1;
         if (mpu_read_mem(ii, this_write, cur))
